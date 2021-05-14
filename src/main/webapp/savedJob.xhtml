@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+<h:body>
+
+	<ui:composition template="/WEB-INF/templates/template.xhtml">
+
+		<ui:define name="metadata">
+			<f:metadata>
+				<f:viewParam id="key" name="key" value="#{savedJobView.key}" />
+				<f:event type="preRenderView" listener="#{savedJobView.init}" />
+			</f:metadata>
+		</ui:define>
+		
+    	<ui:define name="js">
+    	    	<h:outputScript library="js" name="highcharts.js" />
+	    		<h:outputScript>
+		    		$(document).ready(function() {
+						createChart();
+					});
+				</h:outputScript>
+    	</ui:define>
+
+		<ui:define name="content">
+			<h:form>
+
+				<p:outputPanel id="jobDetail" style="text-align:center;"
+					rendered="#{savedJobView.savedJob != null}">
+					<h3>#{savedJobView.savedJob.name}</h3>
+					<h:outputText value="This link will remain active for another #{savedJobView.savedJob.saveTimeLeft} hours &nbsp;" />
+					<p:commandButton value="" icon="fa fa-refresh" actionListener="#{savedJobView.renewSaveJob()}" styleClass="icon-only"
+					title="Renew Job Expiration Time"/>
+					<p:separator style="margin-top:15px;margin-bottom:25px;"/>
+					<div class="ui-grid ui-grid-responsive" style="margin: 0 15px 0 15px;">
+					    <div class="ui-grid-row">
+					        <div class="ui-grid-col-3">
+							    <p:fieldset legend="Content" style="margin-bottom:20px;">
+							        <h:panelGrid columns="1" cellpadding="5" width="100%">
+							        	<h:outputText value="Size: #{savedJobView.savedJob.sequenceSize}"/>
+							            <h:outputText value="#{of:abbreviate(fn:substringAfter(savedJobView.savedJob.content,savedJobView.savedJob.name), 15)}"/>
+							        </h:panelGrid>
+							    </p:fieldset>
+							    <p:fieldset legend="Submitted:" style="margin-bottom:20px;">
+							        <h:panelGrid columns="1" cellpadding="5" width="100%">
+							            <h:outputText value="#{savedJobView.savedJob.submittedDate}"/>
+							        </h:panelGrid>
+							    </p:fieldset>
+							    <p:fieldset legend="Status" style="margin-bottom:20px;">
+							        <h:panelGrid columns="1" cellpadding="5" width="100%">
+							            <h:outputText value="#{savedJobView.savedJob.status}"/>
+							        </h:panelGrid>
+							    </p:fieldset>
+							    <p:fieldset legend="Results" style="margin-bottom:20px;" rendered="#{savedJobView.savedJob.complete}">
+							        <h:panelGrid columns="1" cellpadding="5" width="100%">
+										<p:panel style="border-style:none;" rendered="#{savedJobView.savedJob.complete}">
+											<p:commandButton value="Download" ajax="false"
+												onclick="PrimeFaces.monitorDownload(start, stop);"
+												icon="ui-icon-arrowthick-1-s"
+												rendered="#{savedJobView.savedJob.complete}"
+												disabled="#{!savedJobView.savedJob.complete or savedJobView.savedJob.failed}">
+												<p:fileDownload value="#{savedJobView.savedJob.file}" />
+											</p:commandButton>
+										</p:panel>
+							        </h:panelGrid>
+							    </p:fieldset>
+							</div>
+					        <div class="ui-grid-col-9">
+					        <div id="hc_container" style="width: 100%; height: 100%;"/>
+							</div>
+					    </div>
+					</div>					
+					<p:remoteCommand name="createChart"
+						actionListener="#{savedJobView.createChart()}"
+						oncomplete="handleCreateChart(xhr, status, args);">
+					</p:remoteCommand>
+				</p:outputPanel>
+				<p:outputPanel style="text-align:center;"
+					rendered="#{savedJobView.savedJob == null}">
+					<h:outputText value="No job found with given key!" />
+				</p:outputPanel>
+
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

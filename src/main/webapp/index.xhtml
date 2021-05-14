@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+<h:body>
+	<ui:composition template="/WEB-INF/templates/template.xhtml">
+		<ui:define name="js">
+			<h:outputScript library="js" name="highcharts.js" />
+		</ui:define>
+		<ui:define name="content">
+			<p:outputPanel id="centerPanel" layout="block">
+				<p:outputPanel id="jobsPanel" layout="block"
+					rendered="#{userManager.authenticated}">
+					<div class="title">
+						<h1>
+							MoRF<sub>CHiBi_<i>Web</i></sub>
+						</h1>
+						<h2>Computational Identification of MoRFs in Protein Sequences</h2>
+						
+					</div>
+					<h:form id="inputForm">
+					<p:commandButton actionListener="#{userManager.keepAlive()}" value="" styleClass="icon-only" icon="fa fa-refresh" title="Refresh Session" style="position:absolute;top:16px;right:0px;"/>
+						<p:growl id="growl" life="2000" globalOnly="true" severity="info" escape="false"/>
+						<p:growl id="stickyGrowl" sticky="true" globalOnly="true"
+							severity="error,fatal,warn" escape="false">
+							<h:outputScript>
+						            $("#inputForm\\:stickyGrowl_container").effect( "shake", { times: 3, distance: 4 } );
+						        </h:outputScript>
+						</p:growl>
+
+						<h:panelGrid columns="2" style="margin:0 auto;width:100%;"
+							cellpadding="5" columnClasses="optionsPanel, inputPanel">
+							<p:panel style="border-style:none;" />
+							<h:outputText value="Enter one protein sequence in FASTA format" />
+							<p:panel style="border-style:none;height:100%;padding:0;" header="Options">
+								<h:panelGrid columns="2" style="margin:0 auto;width:100%;"
+									cellpadding="5">
+									<h:outputText value="Training Dataset:"
+										rendered="#{settingsCache.showTraining}" />
+									<p:selectOneButton value="#{indexView.trainOnDataset}"
+										rendered="#{settingsCache.showTraining}">
+										<f:selectItem itemLabel="Full" itemValue="True" />
+										<f:selectItem itemLabel="Training" itemValue="False" />
+									</p:selectOneButton>
+									<p:panel styleClass="no-border panel-no-padding">
+									<h:outputText value="Email " />
+									<p:commandButton id="emailHelpBtn1" value="" styleClass="icon-only" icon="fa fa-question-circle" title="Help" type="button" />
+								    <p:overlayPanel for="emailHelpBtn1" hideEffect="fade" style="width:400px;text-align:left;">
+								        <p><b>Email address for result notification is optional.</b></p>
+								    	<p>If provided, an email will be sent once the task is complete. This email will include both the results and a link to a results page.</p>
+								    	<p>If an email is not provided, the link to the results page can be manually bookmarked. Keep in mind that the link to the result page will be <b>lost</b> if you have not saved it somewhere before your session expires.</p>
+								    </p:overlayPanel>
+									<h:outputText value=":" />
+									</p:panel>
+									<p:inplace editor="true" emptyLabel="Click To Set Email"
+										style="min-width:190px;">
+										<p:inputText value="#{userManager.email}" label="text">
+											<f:validateRegex pattern="(^.+\@.+\..+$)?" />
+										</p:inputText>
+										<span class="ui-inplace-editor">
+										<button type="button"
+											class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only custom-ui-clear-inplace"
+											title="Clear" role="button" aria-disabled="false">
+											<span class="ui-button-icon-left ui-icon ui-c ui-icon-trash"></span><span
+												class="ui-button-text ui-c">ui-button</span>
+										</button>
+										</span>
+									</p:inplace>
+								</h:panelGrid>
+							</p:panel>
+							<p:inputTextarea id="inputContent" value="#{indexView.content}"
+								rows="10" style="width:100%;" autoResize="false" />
+
+							<h:outputText/>
+
+							<p:panel style="border-style:none;">
+								<p:commandButton value="Submit Job" icon="ui-icon-disk"
+									update=":formEmailDlg:panelEmailDlg, :inputForm:stickyGrowl, :inputForm:growl,:formJobs:tableJobs, :inputForm:panelServerInfo"
+									actionListener="#{indexView.submitJob}"
+									styleClass="ui-priority-primary" style="margin-right:25px"
+									oncomplete="handleValidateJobSubmitComplete(xhr, status, args)" />
+<!-- 								<p:commandButton value="Submit Job" icon="ui-icon-disk"
+									update=":formConfirm:confirmDialog, :inputForm:stickyGrowl, :inputForm:growl,:formJobs:tableJobs"
+									actionListener="#{indexView.validateJob}"
+									styleClass="ui-priority-primary" style="margin-right:25px"
+									oncomplete="handleValidateJobSubmitComplete(xhr, status, args)" /> -->
+								<p:commandButton value="Clear" type="button"
+									icon="ui-icon-trash" styleClass="ui-priority-primary"
+									onclick="clearFastaInput()" style="margin-right:25px" />
+								<p:commandButton value="Input Example" icon="ui-icon-copy"
+									styleClass="ui-priority-primary"
+									actionListener="#{indexView.applyExampleInput}"
+									update=":inputForm" />
+									
+							</p:panel>
+							
+							<h:outputText/>
+							
+							<p:panel id="panelServerInfo" styleClass="no-padding" style="width: 500px;">
+								
+								<p style="margin:0;"><b>Server queue:</b> #{jobManager.jobsInQueue} job(s) in the server queue with a total of #{jobManager.residuesInQueue} residues.</p>
+								
+							</p:panel>
+
+						</h:panelGrid>
+					
+					
+					</h:form>
+					<p:separator />
+					<br />
+					<h:form id="formJobs">
+						<p:dataTable id="tableJobs" var="job" value="#{userManager.jobs}"
+							rowStyleClass="#{job.complete eq true ? (job.failed eq true ? 'red-row': 'green-row') : 'yellow-row'}"
+							sortBy="#{job.submittedDate}" resizableColumns="true"
+							emptyMessage="No Jobs Found." style="min-height:350px;">
+							<f:facet name="header">
+					            Jobs
+					        </f:facet>
+
+							<p:column style="width:32px;">
+								<p:commandButton update=":inputForm:growl, :formJobs:tableJobs"
+									icon="fa fa-remove" title="Cancel"
+									action="#{indexView.cancelJob}" disabled="#{job.running}"
+									styleClass="red smallIcon" rendered="#{!job.failed}">
+									<p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+									<f:setPropertyActionListener value="#{job}"
+										target="#{indexView.jobToRemove}" />
+								</p:commandButton>
+								
+								<p:commandButton update=":inputForm:growl, :formJobs:tableJobs"
+									icon="fa fa-remove" title="Cancel"
+									action="#{indexView.cancelJob}" disabled="#{job.running}"
+									styleClass="red smallIcon" rendered="#{job.failed}">
+									<f:setPropertyActionListener value="#{job}"
+										target="#{indexView.jobToRemove}" />
+								</p:commandButton>
+							</p:column>
+
+							<p:column headerText="Id" style="width:64px;text-align: center;">
+								<h:outputText value="#{job.id}" />
+							</p:column>
+							<p:column headerText="Label" style="text-align: center;">
+								<h:outputText value="#{job.name}" />
+							</p:column>
+							<p:column headerText="Size [residues]"
+								style="text-align: center;">
+								<h:outputText value="#{job.sequenceSize}" />
+							</p:column>
+							<p:column headerText="Training" style="text-align: center;"
+								rendered="#{settingsCache.showTraining}">
+								<h:outputText
+									value="#{job.trainOnFullData ? 'Full' : 'Training'}" />
+							</p:column>
+							<p:column headerText="Submitted" style="text-align: center;">
+								<h:outputText value="#{job.submittedDate}" />
+							</p:column>
+
+							<p:column style="text-align: center;">
+							
+							<f:facet name="header">
+							<h:outputText value="Status &nbsp;" />
+							<p:commandButton id="statusBtn1" value="" styleClass="icon-only" icon="fa fa-question-circle" title="Help" type="button" />
+						    <p:overlayPanel for="statusBtn1" hideEffect="fade" style="width:400px;text-align:left;" appendToBody="true">
+								<p>Status can have one of following five values:</p>
+								<ul>
+								<li>
+									<b>&lt;Processing&gt;</b> The sequence is currently been processed.
+								</li>
+								<li>
+									<b>&lt;Position: x&gt;</b> The job is in the server queue at position x.
+								</li>
+								<li>
+									<b>&lt;Pending&gt;</b> The job is in the private user queue.
+								</li>
+								<li>
+									<b>&lt;Completed in Xs&gt;</b> The job has completed in X seconds.
+								</li>
+								<li>
+									<b>&lt;Failed&gt;</b> Error Message.
+								</li>
+								</ul>
+						    </p:overlayPanel>
+							</f:facet>
+							
+
+							
+							
+								<h:outputText value="#{job.status}" />
+							</p:column>
+
+							<p:column headerText="Results" style="text-align: center">
+								<p:commandButton update=":formJobs:jobDetail"
+									oncomplete="PF('jobDialog').show()" icon="ui-icon-search"
+									title="View" value="#{job.failed ? 'Error' : (job.complete ? 'Ready' : 'Not Ready')}">
+									<f:setPropertyActionListener value="#{job}"
+										target="#{indexView.selectedJob}" />
+								</p:commandButton>
+								<p:commandButton title="Graph" icon="fa fa-area-chart"
+									action="#{indexView.createChart}"
+									oncomplete="handleCreateChart(xhr, status, args);PF('chartDlgWdg').show()"
+									disabled="#{!job.complete or job.failed}" value="Graph">
+									<f:setPropertyActionListener value="#{job}"
+										target="#{indexView.selectedJob}" />
+								</p:commandButton>
+								<!-- 								<p:commandButton title="Download" ajax="false"
+									onclick="PrimeFaces.monitorDownload(start, stop);"
+									icon="ui-icon-arrowthick-1-s"
+									disabled="#{!job.complete or job.failed}">
+									<p:fileDownload value="#{job.file}" />
+								</p:commandButton> -->
+							</p:column>
+
+							<p:column style="width:96px;text-align: center">
+								
+							<f:facet name="header">
+							<h:outputText value="Saved For &nbsp;" />
+							<p:commandButton id="savedBtn1" value="" styleClass="icon-only" icon="fa fa-question-circle" title="Help" type="button" />
+						    <p:overlayPanel for="savedBtn1" hideEffect="fade" style="width:400px;text-align:left;" appendToBody="true">
+								<p>The time until results page expiry for this job. Page life can be renewed manually by clicking the renew button &nbsp;<i class="fa fa-refresh"/></p> 
+						    </p:overlayPanel>
+						    </f:facet>
+								
+								
+								<h:outputText value="&nbsp;#{job.saveTimeLeft} hrs &nbsp;"
+									rendered="#{job.saved}" />
+								<p:commandButton icon="fa fa-refresh" title="Renew" styleClass="icon-only"
+									action="#{indexView.renewJob}" rendered="#{job.saved}" oncomplete="pushUpdate();" style="margin-left:5px;">
+									<f:setPropertyActionListener value="#{job}"
+										target="#{indexView.jobToRenew}" />
+								</p:commandButton>
+
+								<!-- 								<p:link outcome="savedJob"
+									target="_blank" rendered="#{job.saved}">
+									<span class="fa fa-external-link" style="display:inline-block;" >
+									<h:outputText value="&nbsp;#{job.saveTimeLeft} hrs" />
+									</span>
+								    <f:param name="key" value="#{job.savedKey}" />
+								</p:link> -->
+
+
+								<p:commandButton icon="fa fa-heart"
+									action="#{indexView.saveJob}"
+									update=":inputForm:stickyGrowl, tableJobs"
+									rendered="#{!job.saved and !job.failed}">
+									<f:setPropertyActionListener value="#{job}"
+										target="#{indexView.jobToSave}" />
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+
+						<p:dialog header="Job Info" widgetVar="jobDialog" modal="false"
+							showEffect="fade" hideEffect="fade" resizable="false"
+							dynamic="true" width="400px">
+							<p:outputPanel id="jobDetail" style="text-align:center;width:100%">
+								<p:panelGrid style="width:100%;" styleClass="dialogPanelLabelColumn">
+									<p:row>
+										<p:column>
+											<h:outputText value="Id:" />
+										</p:column>
+										<p:column>
+											<h:outputText value="#{indexView.selectedJob.id}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText value="Label:" />
+										</p:column>
+										<p:column>
+											<h:outputText value="#{indexView.selectedJob.name}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText value="Size:" />
+										</p:column>
+										<p:column>
+											<h:outputText value="#{indexView.selectedJob.sequenceSize}" />
+										</p:column>
+									</p:row>
+									<p:row rendered="#{settingsCache.showTraining}">
+										<p:column >
+											<h:outputText value="Training:" />
+										</p:column>
+										<p:column>
+											<h:outputText
+												value="#{indexView.selectedJob.trainOnFullData ? 'Full' : 'Training'}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText value="Content:" />
+										</p:column>
+										<p:column>
+											<h:outputText
+												value="#{of:abbreviate(fn:substringAfter(indexView.selectedJob.content,indexView.selectedJob.name), 15)}" />
+										</p:column>
+
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText value="Submitted:" />
+										</p:column>
+										<p:column>
+											<h:outputText value="#{indexView.selectedJob.submittedDate}" />
+										</p:column>
+
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText value="Status:" />
+										</p:column>
+										<p:column>
+											<h:outputText value="#{indexView.selectedJob.status}" />
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+									<h:outputText value="Email " />
+									<p:commandButton id="emailHelpBtn2" value="" styleClass="icon-only" icon="fa fa-question-circle" title="Help" type="button" />
+								    <p:overlayPanel for="emailHelpBtn2" hideEffect="fade" style="width:400px;text-align:left;">
+								        <p><b>Email address for result notification is optional.</b></p>
+								    	<p>If provided, an email will be sent once the task is complete. This email will include both the results and a link to a results page.</p>
+								    	<p>If an email is not provided, the link to the results page can be manually bookmarked. Keep in mind that the link to the result page will be <b>lost</b> if you have not saved it somewhere before your session expires.</p>
+								    </p:overlayPanel>
+									<h:outputText value=":" />
+										</p:column>
+										<p:column>
+									<p:inplace editor="true" emptyLabel="Click To Set Email"
+										style="min-width:190px;">
+										<p:ajax event="save" update="jobDetail,"/>
+										<p:inputText value="#{indexView.selectedJob.email}" label="text">
+											<f:validateRegex pattern="(^.+\@.+\..+$)?" />
+										</p:inputText>
+										<span class="ui-inplace-editor">
+										<button type="button"
+											class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only custom-ui-clear-inplace"
+											title="Clear" role="button" aria-disabled="false">
+											<span class="ui-button-icon-left ui-icon ui-c ui-icon-trash"></span><span
+												class="ui-button-text ui-c">ui-button</span>
+										</button>
+										</span>
+									</p:inplace>
+									<p:commandButton rendered="#{not empty indexView.selectedJob.email and indexView.selectedJob.complete}" actionListener="#{indexView.resendEmailSelected()}" 
+									value="" styleClass="icon-only" icon="fa fa-mail-forward" title="Resend Email" style="margin-left:15px;"
+									update=":inputForm"/>
+									
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column>
+											<h:outputText value="Saved For:" />
+										</p:column>
+										<p:column>
+											<h:outputText
+												value="&nbsp;#{indexView.selectedJob.saveTimeLeft} hrs"
+												rendered="#{indexView.selectedJob.saved}" />
+
+											<!-- 									<p:link outcome="savedJob"
+										target="_blank" rendered="#{indexView.selectedJob.saved}">
+										<span class="fa fa-external-link" style="display:inline-block;" >
+										<h:outputText value="&nbsp;#{indexView.selectedJob.saveTimeLeft} hrs left" />
+										</span>
+									    <f:param name="key" value="#{indexView.selectedJob.savedKey}" />
+									</p:link>	 -->
+											<p:commandButton icon="fa fa-heart"
+												action="#{indexView.saveJob}"
+												update=":inputForm:stickyGrowl, :formJobs:jobDetail"
+												rendered="#{!indexView.selectedJob.saved and !indexView.selectedJob.failed}">
+												<f:setPropertyActionListener
+													value="#{indexView.selectedJob}"
+													target="#{indexView.jobToSave}" />
+											</p:commandButton>
+										</p:column>
+									</p:row>
+									<p:row>
+										<p:column colspan="2" style="text-align:center;">
+											<p:panel style="border-style:none;">
+												<p:commandButton value="Download" ajax="false"
+													onclick="PrimeFaces.monitorDownload(start, stop);"
+													icon="ui-icon-arrowthick-1-s"
+													disabled="#{!indexView.selectedJob.complete}">
+													<p:fileDownload value="#{indexView.selectedJob.file}" />
+												</p:commandButton>
+												<p:commandButton value="Graph" icon="fa fa-area-chart"
+													action="#{indexView.createChart}"
+													oncomplete="handleCreateChart(xhr, status, args);PF('chartDlgWdg').show()"
+													disabled="#{!indexView.selectedJob.complete or indexView.selectedJob.failed}"/>
+												<p:button value="Link" icon="fa fa-external-link"
+													outcome="savedJob" target="_blank"
+													rendered="#{indexView.selectedJob.saved}" >
+															<f:param name="key" value="#{indexView.selectedJob.savedKey}" />
+													</p:button>
+
+											</p:panel>
+										</p:column>
+									</p:row>
+
+								</p:panelGrid>
+							</p:outputPanel>
+						</p:dialog>
+
+						<p:socket onMessage="pushUpdateHandler" channel="/jobDone" />
+
+						<p:remoteCommand name="pushUpdate" update="tableJobs, jobDetail, :inputForm:panelServerInfo" />
+
+
+					</h:form>
+					<h:form id="chartForm">
+						<p:dialog id="chartDlg" fitViewport="true" modal="false"
+							widgetVar="chartDlgWdg" resizable="false" height="500px"
+							width="80%">
+
+							<div id="hc_container" style="width: 100%; height: 100%;" />
+
+						</p:dialog>
+					</h:form>
+
+				</p:outputPanel>
+				<p:outputPanel id="authenticatePanel" layout="block"
+					rendered="#{!(userManager.authenticated)}">
+					<h3>Please authenticate your session</h3>
+					<h:form>
+						<p:growl id="authenticateGrowl" life="2000" />
+						<h:panelGrid columns="2" style="margin-bottom:10px"
+							cellpadding="5">
+							<p:outputLabel for="password" value="Passphrase: " />
+							<p:password id="password" binding="#{pass}" />
+						</h:panelGrid>
+						<p:commandButton value="Authenticate"
+							icon="ui-icon-arrowthickstop-1-e"
+							update="authenticateGrowl, :centerPanel, :formEmailDlg, :formConfirm"
+							action="#{userManager.authenticate(pass.value)}"
+							styleClass="ui-priority-primary" />
+					</h:form>
+				</p:outputPanel>
+			</p:outputPanel>
+		</ui:define>
+		<ui:define name="dialogs">
+		
+		<h:form id="formEmailDlg" >
+				<p:dialog id="noEmailDlg" header="A Reminder"
+					widgetVar="noEmailDlg" showEffect="fade"
+					style="min-width:349px;" closeOnEscape="true" resizable="false" rendered="#{userManager.authenticated}">
+					<p:panel id="panelEmailDlg" styleClass="no-border">
+						<p style="width: 349px; font-style: italic;">In the case of your browser session being lost or expiring, the links to all result pages will also be lost!</p>
+						<p style="width: 349px; font-style: italic;">It is strongly recommended that links to result pages be secured by either:</p>
+						
+								<ul>
+								<li>
+									<p style="width: 349px; font-style: italic;"><b>Bookmarking</b> the following 	<p:link outcome="savedJob" value="LINK"
+										target="_blank" rendered="#{indexView.submittedJob.saved}">
+									    <f:param name="key" value="#{indexView.submittedJob.savedKey}" />
+									</p:link>, which will be available for the next #{settingsCache.jobPurgeTime} hours.</p>
+								</li>
+								<li>
+									<p style="width: 349px; font-style: italic;"><b>Providing an email</b> so that a notification with attached results and <p:link outcome="savedJob" value="LINK"
+										target="_blank" rendered="#{indexView.submittedJob.saved}">
+									    <f:param name="key" value="#{indexView.submittedJob.savedKey}" />
+									</p:link> can be sent upon job completion. </p>
+								</li>
+								</ul>
+								
+								<p:panel styleClass="no-border" style="text-align:center;">
+								
+											<p:inplace editor="true" emptyLabel="Click To Set Email">
+												<p:inputText value="#{indexView.submittedJob.email}"
+													label="text"/>
+											</p:inplace>
+								</p:panel>
+								
+								<p:separator/>
+								
+								<p:panel styleClass="no-border" style="text-align:center;">
+									<p:commandButton value="Ignore" icon="fa fa-close" title="Ignore" type="button" onclick="PF('noEmailDlg').hide();"/>
+								</p:panel>
+						
+<!-- 						<p style="width: 349px; font-style: italic;">No email was provided, you can set one below to receive notice and results of job completion by email.</p>
+						<p style="width: 349px; font-style: italic;">Otherwise, your job will available at this 
+									<p:link outcome="savedJob" value="LINK"
+										target="_blank" rendered="#{indexView.submittedJob.saved}">
+									    <f:param name="key" value="#{indexView.submittedJob.savedKey}" />
+									</p:link> for the next #{settingsCache.jobPurgeTime} hours.</p>
+						<p:separator />
+						<h:panelGrid columns="2" style="margin:0 auto;width:100%;"
+							cellpadding="5">
+							<h:outputText value="Label:" />
+							<h:outputText value="#{indexView.submittedJob.name}" />
+							<h:outputText value="Sequence Size:" />
+							<h:outputText value="#{indexView.submittedJob.sequenceSize}" />
+								<h:outputText value="Training:" rendered="#{settingsCache.showTraining}"/>
+								<h:outputText value="#{indexView.submittedJob.trainOnFullData ? 'Full' : 'Training'}" rendered="#{settingsCache.showTraining}"/>
+							<h:outputText value="Email:" />
+											<p:inplace editor="true" emptyLabel="Click To Set Email">
+												<p:inputText value="#{indexView.submittedJob.email}"
+													label="text"/>
+											</p:inplace>
+						</h:panelGrid>-->
+						</p:panel> 
+				</p:dialog>
+				</h:form>
+		
+		
+			<h:form id="formConfirm">
+			    <p:confirmDialog global="true" showEffect="fade" rendered="#{userManager.authenticated}">
+			        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			    </p:confirmDialog>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

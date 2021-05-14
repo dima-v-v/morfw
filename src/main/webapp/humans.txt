@@ -1,0 +1,11 @@
+/* Web Application & UI */
+	Matthew Jacobson
+	Contact: JacobsonMT [at] gmail [dot] com
+	Github: https://github.com/JacobsonMT
+
+/* Computational Software */
+	Nawar Malhis
+	Contact: nmalhis [at] chibi [dot] ubc [dot] ca
+	
+	Joerg Gsponer
+	Contact: gsponer [at] chibi [dot] ubc [dot] ca

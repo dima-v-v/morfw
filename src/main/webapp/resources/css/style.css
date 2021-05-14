@@ -1,0 +1,204 @@
+html {
+	height: 100%;
+	padding-bottom: 1px; /* force scrollbars */
+}
+
+body {
+	background: #FFF;
+	color: #444;
+	font: normal 85% sans-serif;
+	/* line-height: 1.5; */
+}
+
+div.footer {
+	text-align:center;
+	margin: 10px 0 10px 0;
+}
+
+div.footer p {
+	margin:0;
+}
+
+div.footer a:hover {color: #000;}
+
+a:focus,a:hover {color: #039;}
+a {
+	color: #456;
+	text-decoration: none;
+}
+a:hover {text-decoration: underline;}
+
+div.button-block {
+	margin-top:25px;
+}
+
+#centerPanel {
+	padding-left:25px;
+	padding-right:25px;
+}
+
+.left,.alignleft {float: left;}
+
+.no-border {
+	border-style: none;
+}
+
+table tbody tr.yellow-row {
+	background-color: #f4edb1;
+	background: #f4edb1;
+}
+
+table tbody tr.green-row {
+	background-color: #a5dda5;
+	background: #a5dda5;
+}
+
+table tbody tr.red-row {
+	background-color: #ce8987;
+	background: #ce8987;
+}
+
+div.ui-datatable-tablewrapper table tbody td {
+	text-align:center;
+}
+
+.ui-icon.fa {
+	text-indent:0px;
+	background-image:none;
+	font-size: initial;
+ }
+ 
+ #top div.ui-layout-unit-content.ui-widget-content {
+ overflow:hidden;}
+ 
+ div.title {
+ text-align:center;
+ margin-bottom:50px;
+ }
+ 
+ sub {
+ font: normal 45% sans-serif;
+ }
+ i {
+ font-style: italic;
+ }
+ 
+ #inputForm\:inputContent {
+font-family: "Courier New", Courier, monospace
+ }
+ 
+ #inputForm table tr,  #inputForm table td {
+ border:none;
+ }
+ 
+ .spaced-list li {
+ 	line-height:2em;
+ }
+ 
+ .optionsPanel {
+ width:425px;
+ text-align:left;
+ vertical-align: top;
+ padding-left:0;
+ }
+ 
+  .optionsPanel td { 
+  height:44px;
+  }
+  
+  .optionsPanel tr td:first-child {
+  	width:103px;
+  	text-align:right;
+  }
+ 
+/*  div[id="formJobs\:stickyGrowl_container"] > div {
+            background: #a5dda5 !important;
+        } */
+        
+span.ui-inplace-display {
+	text-decoration: underline;
+}
+
+.ui-icon.ui-confirm-dialog-severity {
+    background-position: 0 0 !important; 
+    background-image: none !important;
+}
+
+a {
+	text-decoration: underline !important;
+}
+
+button.red span {
+	color:#fc5252;
+}
+
+table.dialogPanelLabelColumn tr td:first-child {
+	width: 70px;
+	text-align:right;
+}
+
+table.dialogPanelLabelColumn tr td:last-child {
+	text-align:left;
+}
+
+table.dialogPanelLabelColumn tr {
+	height: 33px;
+}
+
+table.dialogPanelLabelColumn tr td {
+	border:none !important;
+}
+
+div.ui-panel.panel-no-padding {
+	padding:0;
+}
+
+div.ui-panel.panel-no-padding div.ui-panel-content {
+	padding:0;
+}
+
+button.ui-button.icon-only {
+	background:none;
+	border:none;
+	width:16px;
+}
+
+button.ui-button.icon-only:focus {
+	outline:none;
+}
+
+button.ui-button.icon-only span {
+	left:0;
+	margin-top: -13px;
+}
+
+sub.text {
+	 font: normal 65% sans-serif;
+}
+
+div.scrollspy {
+	position:fixed;
+	left:0px;
+	padding:20px;
+	background: #dfeffc url("/morf/javax.faces.resource/images/ui-bg_glass_85_dfeffc_1x400.png?ln=primefaces-redmond") 50% 50% repeat-x;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+}
+
+button.smallIcon span.ui-icon{
+	font-size: 14px;
+}
+
+table.simple-table td {
+	  padding-left: 10px;
+	  padding-top: 10px;
+}
+
+table.simple-table tr td:first-child {
+	  padding-left: 0px;
+}
+
+table.simple-table tr:first-child td {
+	  padding-top: 0px;
+}

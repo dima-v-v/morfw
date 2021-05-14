@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view>
+<ui:insert name="metadata"/>
+
+<h:head>
+	<title>MoRF</title>
+	
+	<link rel="icon" type="image/x-icon" href="#{resource['img/favicon.ico']}"/>
+	<link rel="icon" type="image/png" href="#{resource['img/favicon-32x32.png']}" sizes="32x32"/>
+	<link rel="icon" type="image/png" href="#{resource['img/favicon-96x96.png']}" sizes="96x96"/>
+	<link rel="icon" type="image/png" href="#{resource['img/favicon-16x16.png']}" sizes="16x16"/>
+	
+	<h:outputStylesheet
+		name="webjars/font-awesome/4.2.0/css/font-awesome.css" />
+	<h:outputStylesheet library="css" name="style.css" />
+	
+	<h:outputStylesheet library="css" name="showcase.css" />
+	<h:outputScript library="js" name="morf.js?version=2" />
+  	<ui:insert name="js" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!-- Prevents caching at the Proxy Server -->
+
+	<meta http-equiv="Expires" content="0" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="description"
+		content="Computational Identification of Binding Regions in Disordered Proteins" />
+
+	<meta name="keywords"
+		content="genomics,bioinformatics,genetics,gene,statistics,open source,software,fasta" />
+	<meta name="author" content="morf admin (#{settingsCache.getProperty('morf.contact1.email')})" />
+
+</h:head>
+
+<h:body>
+
+	<p:layout fullPage="true">
+
+		<p:layoutUnit id="top" position="north" resizable="false" size="50" gutter="1" collapsible="true">
+
+			<h:form>
+				<p:menubar toggleEvent="click" style="border: 1px solid #FFF">
+					<p:menuitem value="Home" url="index.xhtml" icon="fa fa-home"
+						styleClass="right-border" />
+					<p:menuitem value="About" url="about.xhtml"
+						icon="fa fa-info-circle" styleClass="right-border" />
+					<p:menuitem value="Help" url="help.xhtml"
+						icon="fa fa-question-circle" styleClass="right-border" />
+					<f:facet name="options" style="vertical-align:middle;">
+						<h4 style="position:absolute;margin:8px 0;right:30px;">Michael Smith Laboratories - Centre for High-Throughput Biology, University of British Columbia</h4>
+			        </f:facet>
+				</p:menubar>
+			</h:form>
+
+		</p:layoutUnit>
+
+		<p:layoutUnit id="center" position="center">
+	  	<ui:insert name="content" >
+	   	</ui:insert>
+	   	<p:separator style="margin-top:20px;"/>
+			<div class="footer">
+				<p>
+					&copy; UBC, Centre for High-throughput Biology, 2015
+					<h:link value="Terms and Conditions" outcome="/about.xhtml" />
+					<h:link value="Contact Us" outcome="/about.xhtml" style="position:absolute;right:50px;"/>
+				</p>
+			</div>
+		</p:layoutUnit>
+
+	</p:layout>
+	
+	<ui:insert name="dialogs">
+   <!-- a modal dialog etc. -->
+	</ui:insert>
+
+	<p:dialog modal="true" widgetVar="statusDialog" header="Status"
+		draggable="false" closable="false" resizable="false">
+		<p:graphicImage library="img" name="loader.gif" />
+	</p:dialog>
+
+
+
+</h:body>
+</f:view>
+</html>

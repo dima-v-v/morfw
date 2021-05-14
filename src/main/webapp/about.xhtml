@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:body>
+
+	<ui:composition template="/WEB-INF/templates/template.xhtml">
+		<ui:define name="content">
+			<h:form>
+
+				<div class="title">
+					<h1>
+						MoRF<sub>CHiBi_<i>Web</i></sub>
+					</h1>
+					<h2>Computational Identification of MoRFs in Protein Sequences</h2>
+					<h3>Beta Version: 0.13</h3>
+				</div>
+
+				<p:fieldset legend="Description" style="margin-bottom:20px">
+					<h:panelGrid columns="1" cellpadding="5">
+						<h:outputText
+							value="Intrinsically disordered regions of proteins play an essential role in the regulation of various biological processes. Key to their regulatory function is often the binding to globular proteins domains via molecular recognition features, MoRFs, in a process known as disorder-to-order transition. Predicting the location of MoRFs in protein sequences is an important computational challenge.
+MoRF_CHiBi is a light, fast, accurate and easy to use computational MoRF predictor, which makes it useful in the analysis of large data sets or as input generator for other programs." />
+					</h:panelGrid>
+				</p:fieldset>
+
+				<p:fieldset legend="Contact" style="margin-bottom:20px">
+					<h:panelGrid columns="1" cellpadding="5">
+            For any inquiries, please contact us via #{settingsCache.getProperty('morf.contact1.name')} (<a
+							href="mailto:#{settingsCache.getProperty('morf.contact1.email')}?Subject=MoRF"
+							target="_top">#{settingsCache.getProperty('morf.contact1.email')}</a>) or #{settingsCache.getProperty('morf.contact2.name')} (<a
+							href="mailto:#{settingsCache.getProperty('morf.contact2.email')}?Subject=MoRF"
+							target="_top">#{settingsCache.getProperty('morf.contact2.email')}</a>)
+        			</h:panelGrid>
+				</p:fieldset>
+
+				<p:fieldset legend="Citation" style="margin-bottom:20px">
+					<h:panelGrid columns="1" cellpadding="5">
+						<h:outputText value="Under review" />
+					</h:panelGrid>
+				</p:fieldset>
+				
+				<p:fieldset legend="Credits" style="margin-bottom:20px">
+					<h:panelGrid columns="1" cellpadding="0">
+						<h4 style="margin-bottom:5px">Computational MoRF Prediction Software Tool</h4>
+						<h:outputText value="Nawar Malhis &amp; Joerg Gsponer" style="margin-left:15px"/>
+						<h4 style="margin-bottom:5px">Fully-Synchronized Job Queueing System &amp; Web Application</h4>
+						<h:outputText value="Matthew Jacobson" style="margin-left:15px"/>
+						<h:outputText value="JacobsonMT+MoRF [at] gmail [dot] com" style="margin-left:15px"/>
+						<a href="https://github.com/JacobsonMT" target="_blank" style="margin-left:15px">https://github.com/JacobsonMT</a>
+					</h:panelGrid>
+				</p:fieldset>
+
+				<p:fieldset legend="Terms &amp; Conditions" toggleable="true"
+					toggleSpeed="500" collapsed="true">
+					<h:panelGrid columns="1" cellpadding="5">
+						<h:outputText
+							value="These UBC Terms of Use set out the terms and conditions that will govern your relationship with UBC, through your use of MoRF_CHibi, including without limitation, your access to the MoRF_CHibi Website, underlying MoRF_CHibi software (the “UBC Software”) through a web browser, web service or other electronic means, uploading data to the MoRF_CHibi Website, downloading data from the MoRF_CHibi Website, searching, using analytical tools or visualizations and other software related services that may be provided by UBC through the MoRF_CHibi Website (the “UBC Services”). You are hereby notified that the UBC Software has been developed and is licensed under the Apache License, Version 2.0 (the “License”); and you may not use the UBC Software except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. UBC disclaims all representation and/or warranties, and bears no responsibility and/or liability for either third party software or the UBC Services. For greater certainty, the “UBC Services” does not include the actual license of the underlying UBC Software to you, which would if requested by you and agreed to by UBC, would be set up through a private installation and governed by a separate license agreement between UBC and you."></h:outputText>
+					</h:panelGrid>
+				</p:fieldset>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
